@@ -1,7 +1,0 @@
-{
-  "name": "lily-static-page",
-  "private": true,
-  "scripts": {
-    "build": "node -e \"console.log('Static HTML: no build step required')\""
-  }
-}
