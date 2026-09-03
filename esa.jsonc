@@ -1,0 +1,9 @@
+{
+  "name": "lily",
+  "installCommand": "",
+  "buildCommand": "",
+  "assets": {
+    "directory": ".",
+    "notFoundStrategy": "singlePageApplication"
+  }
+}
