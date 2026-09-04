@@ -145,9 +145,12 @@ function rowToObject(row) {
   return output;
 }
 
-function attributeColumns(attributes) {
+function attributeColumns(attributes, primaryKeyName) {
   return Object.entries(attributes)
-    .filter(([, value]) => value !== undefined && value !== null)
+    .filter(
+      ([name, value]) =>
+        name !== primaryKeyName && value !== undefined && value !== null,
+    )
     .map(([name, value]) => ({ [name]: encodeValue(value) }));
 }
 
@@ -175,15 +178,18 @@ export async function putRow(logicalName, keyValue, attributes, options = {}) {
         : TableStore.RowExistenceExpectation.IGNORE,
     ),
     primaryKey: [{ [keyName]: keyValue }],
-    attributeColumns: attributeColumns(attributes),
+    // Tablestore does not allow a primary-key column to be repeated in the
+    // attribute column list. Callers may include the logical id so returned
+    // objects keep a consistent shape; omit it from the serialized attributes.
+    attributeColumns: attributeColumns(attributes, keyName),
   });
 }
 
 export async function updateRow(logicalName, keyValue, attributes) {
   const keyName = await primaryKeyName(logicalName);
-  const toPut = attributeColumns(attributes);
+  const toPut = attributeColumns(attributes, keyName);
   const toDelete = Object.entries(attributes)
-    .filter(([, value]) => value === null)
+    .filter(([name, value]) => name !== keyName && value === null)
     .map(([name]) => name);
   const updates = [];
   if (toPut.length) updates.push({ PUT: toPut });
@@ -264,4 +270,3 @@ export async function deleteObject(objectKey) {
     if (error?.code !== 'NoSuchKey' && error?.status !== 404) throw error;
   }
 }
-
