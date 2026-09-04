@@ -1,0 +1,9 @@
+{
+  "name": "lily",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "npm run build:web",
+  "assets": {
+    "directory": "./dist",
+    "notFoundStrategy": "singlePageApplication"
+  }
+}
